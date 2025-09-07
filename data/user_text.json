@@ -1,0 +1,81 @@
+{
+  "Profile Card": {
+    "user_id": "kriti-rohilla",
+    "Name": "Kriti Rohilla",
+    "City": "Hyderabad, Telangana, India",
+    "Linkedin URL": "https://www.linkedin.com/in/kriti-rohilla/",
+    "Linkedin Description": "I am a CS engineer passionate about solving complex problems and building systems that scale. I am currently working with Goldman Sachs as a Risk Engineer with the Market Risk team and building things that help in tracking the firm's risk based on market movements. I have worked across different domains and have built applications and systems that scale. I have worked in Gramener and was a student in Google Summer of Code 2018. I hold a Bachelor's in CS from UIET, Panjab University, Chandigarh. On the side, I am reading books on business stories and human psychology reading a few engineering books every now and then studying concepts and challeges in system design and engineering.",
+    "Current Company": "Microsoft",
+    "Current Company Url": "https://www.linkedin.com/company/microsoft",
+    "Current Position": "Software Engineer 2",
+    "Previous Company": "Goldman Sachs",
+    "Previous Position": "Associate - Market Risk Engineering",
+    "Other Experiences": [
+      {
+        "company": "Coinbase",
+        "title": "Software Engineer 2",
+        "duration": "8 months",
+        "date": "Apr 2024 - Dec 2024",
+        "location": "India",
+        "description": "Not available"
+      },
+      {
+        "company": "Gramener",
+        "title": "Software Engineer",
+        "duration": "1 year 7 months",
+        "date": "Jun 2019 - Dec 2020",
+        "location": "Hyderabad, Telangana, India",
+        "description": "Not available"
+      },
+      {
+        "company": "Gramener",
+        "title": "Python Developer Intern",
+        "duration": "6 months",
+        "date": "Jan 2019 - Jun 2019",
+        "location": "Hyderabad Area, India",
+        "description": "Not available"
+      },
+      {
+        "company": "Google",
+        "title": "Mentor - Google CodeIn 2018",
+        "duration": "2 months",
+        "date": "Oct 2018 - Dec 2018",
+        "location": "Not available",
+        "description": "Google CodeIn 2018 for coala"
+      },
+      {
+        "company": "coala Association e.V. (coala.io static analyzer)",
+        "title": "Software Developer",
+        "duration": "8 months",
+        "date": "Jan 2018 - Sep 2018",
+        "location": "Remote",
+        "description": "Not available"
+      },
+      {
+        "company": "Google",
+        "title": "Student Developer - Google Summer of Code 2018",
+        "duration": "4 months",
+        "date": "Apr 2018 - Aug 2018",
+        "location": "Remote",
+        "description": "Developer @coala.io in Google Summer of Code 2018."
+      },
+      {
+        "company": "Smart India Hackthon 2018",
+        "title": "Team Lead",
+        "duration": "1 month",
+        "date": "Feb 2018 - Mar 2018",
+        "location": "Hyderabad Area, India",
+        "description": "- Lead a team of six for grand finale of Smart India Hackathon 2018- Team selected among top 10 finalists- Project was to make a web portal for allowing single window clearance system for booking places for film shooting in Delhi, India"
+      },
+      {
+        "company": "Code Quotient",
+        "title": "Intern",
+        "duration": "2 months",
+        "date": "Jun 2017 - Jul 2017",
+        "location": "Mohali, Punjab",
+        "description": "Implementation of algorithms in C++."
+      }
+    ],
+    "Professional Summary": "Kriti Rohilla is a skilled Software Engineer with a strong background in Computer Science and Engineering. Currently at Microsoft, she specializes in building scalable systems and solving complex problems, particularly in risk engineering. With previous experience at Goldman Sachs and Coinbase, she has developed applications that enhance risk tracking based on market movements. Kriti is passionate about technology and open-source contributions, having participated in Google Summer of Code. She holds a Bachelor's degree from UIET, Panjab University, and is committed to continuous learning in system design and engineering."
+  }
+}
