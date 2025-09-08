@@ -110,7 +110,7 @@ Respond in WhatsApp style about the meeting scheduling outcome.""",
 Message: {latest_user_msg}
 Context: {conversation_summary}
 
-Return JSON: {{"action": "meeting"}} if about scheduling/rescheduling/canceling meetings, else {{"action": "general"}}"""
+Return JSON: {{"action": "meeting"}} if about scheduling/rescheduling/canceling meetings or reminders, else {{"action": "general"}}"""
         }
     
     elif mode == 'linkedin':
@@ -459,6 +459,51 @@ def company_profile_to_human_text(company_text: dict) -> str:
     chain = prompt | llm
     return chain.invoke({"company_text": company_text}).content
 
+# def generate_email_script(user_profile: str, company_profile: str, product_card: str) -> dict:
+#     """
+#     Generates a personalized outreach Email script with subject + body.
+#     """
+#     parser = JsonOutputParser()
+
+#     prompt = ChatPromptTemplate.from_template("""
+#     You are a persuasive sales assistant.
+#     You are given three inputs:
+#     - User profile: {user_profile}
+#     - Company profile: {company_profile}
+#     - Product information: {product_info}
+
+#     Task: Create an ATTRACTIVE, SALES-FOCUSED, personalized outreach email script in JSON format:
+
+#     {{
+
+#       "Outreach Scripts": {{
+#         "Email": {{
+#           "Subject": "<catchy and professional subject line>",
+#           "Body": "<200-250 word persuasive email body>"
+#         }}
+#       }}
+#     }}
+
+#     RULES:
+#     - Your name is Jack, You work in Vectrum Solutions.
+#     - Personalize deeply using the user profile, company profile, and product information.
+#     - Do not invent or assume new facts; strictly use only the provided data.
+#     - Subject must be concise and engaging.
+#     - Body must start with a hook, acknowledge company's mission/updates, show ROI alignment.
+#     - Keep it formal, polished, and compelling.
+#     - The email should sound like an actual person writing the email. It shouldnt sound like an ai generated email.
+#     - You aren't allowed to give out pricing and product free trials at any cost. you are prohibited to do this.
+#     - Output MUST be valid JSON only.
+#     """)
+
+#     chain = prompt | llm | parser
+#     return chain.invoke({
+#         "user_profile": user_profile,
+#         "company_profile": company_profile,
+#         "product_info": product_card
+#     })
+
+
 def generate_email_script(user_profile: str, company_profile: str, product_card: str) -> dict:
     """
     Generates a personalized outreach Email script with subject + body.
@@ -466,7 +511,7 @@ def generate_email_script(user_profile: str, company_profile: str, product_card:
     parser = JsonOutputParser()
 
     prompt = ChatPromptTemplate.from_template("""
-    You are a persuasive sales assistant.
+    You are a persuasive sales assistant named Jack working at Vectrum Solutions.
     You are given three inputs:
     - User profile: {user_profile}
     - Company profile: {company_profile}
@@ -475,7 +520,6 @@ def generate_email_script(user_profile: str, company_profile: str, product_card:
     Task: Create an ATTRACTIVE, SALES-FOCUSED, personalized outreach email script in JSON format:
 
     {{
-
       "Outreach Scripts": {{
         "Email": {{
           "Subject": "<catchy and professional subject line>",
@@ -484,16 +528,32 @@ def generate_email_script(user_profile: str, company_profile: str, product_card:
       }}
     }}
 
-    RULES:
-    - Your name is Jack, You work in Vectrum Solutions.
-    - Personalize deeply using the user profile, company profile, and product information.
-    - Do not invent or assume new facts; strictly use only the provided data.
-    - Subject must be concise and engaging.
-    - Body must start with a hook, acknowledge company's mission/updates, show ROI alignment.
-    - Keep it formal, polished, and compelling.
-    - The email should sound like an actual person writing the email. It shouldnt sound like an ai generated email.
-    - You aren't allowed to give out pricing and product free trials at any cost. you are prohibited to do this.
-    - Output MUST be valid JSON only.
+    CRITICAL RULES FOR EMAIL BODY:
+    - Start with "Dear [Name from user profile]," using the ACTUAL name from the profile
+    - Your signature must be exactly: "Best regards,\nJack\nSales Representative\nVectrum Solutions\njack@vectrumtech.com\n+1 (555) 123-4567"
+    - NO PLACEHOLDERS anywhere in the email - use real information from the profiles
+    - NO brackets like [Recipient's Name], [Your Position], [Company Name], etc.
+    - Use SPECIFIC company details, recent news, and user's actual role/experience
+    - Personalize deeply using the user profile, company profile, and product information
+    - Do not invent or assume new facts; strictly use only the provided data
+    - Subject must be concise and engaging
+    - Body must start with a hook, acknowledge company's mission/updates, show ROI alignment
+    - Keep it formal, polished, and compelling
+    - The email should sound like an actual person writing to a specific person at a specific company
+    - You aren't allowed to give out pricing and product free trials at any cost
+    - Output MUST be valid JSON only
+
+    EXAMPLE OF WHAT NOT TO DO:
+    - "Dear [Recipient's Name]" ❌
+    - "[Your Position]" ❌  
+    - "[Company updates]" ❌
+    - "[Your contact info]" ❌
+
+    EXAMPLE OF WHAT TO DO:
+    - "Dear Sarah Johnson," ✅
+    - "Jack\nSales Representative" ✅
+    - "your recent expansion into European markets" ✅
+    - "jack@vectrumtech.com" ✅
     """)
 
     chain = prompt | llm | parser
@@ -729,10 +789,34 @@ def _check_availablility(calendar, sch_response):
     }
 
 
-def _scheduler(id, sch_response):
+def _scheduler(id, sch_response, communication_mode):
     print('Scheduling the event...')
     print(sch_response)
+    
     calendar = load_calendar()
+    if sch_response['action'].lower() == 'reminder':
+        if 'reminder' in calendar:
+            calendar['reminder'].append({
+                "id": id,
+                "date": sch_response['date'],
+                "time": sch_response['time'],
+                "type": communication_mode
+            })
+        
+        else:
+            calendar['remainder'] = [{
+                "id": id,
+                "date": sch_response['date'],
+                "time": sch_response['time'],
+                "type": communication_mode
+            }]
+    
+        _save_calendar(calendar)
+        return {
+                "success": True,
+                "message": f"Reminder Scheduled at {sch_response['date']} {sch_response['time']}"
+            }
+    
     
     if sch_response['intent'].lower() == 'schedule':
         avail_msg = _check_availablility(calendar, sch_response)
@@ -899,7 +983,7 @@ def detect_and_schedule_node(state: dict) -> dict:
     if sch_response:
         # Fixed typo: 'reschule' -> 'reschedule'
         if sch_response['intent'].lower() == 'schedule' or sch_response['intent'].lower() == 'reschedule':
-            sch_resp = _scheduler(state['conversation_id'], sch_response)
+            sch_resp = _scheduler(state['conversation_id'], sch_response, state['communication_mode'])
             state['log'].append(
                 {
                     "id": state['conversation_id'],
@@ -955,8 +1039,47 @@ def detect_and_schedule_node(state: dict) -> dict:
     state = summarize_node(state)
     return state
 
+def _check_product_reminder(state, user_msg):
+    prompt = prompts.PRODUCT_REMINDER_PROMPT.format(
+        user_profile = str(user_text),
+        communication_mode = state['communication_mode'],
+        product_details = prompts.PRODUCT_CARD,
+        conversation_summary = state['conversation_summary'],
+        user_msg = user_msg)
+
+    response = llm.invoke(prompt).content
+    resp = jp.parse_json_response(response)
+    
+    if resp['valid'] == 'yes':
+        return {
+            "success": True,
+            "type": resp['type'],
+            "message": resp['message']
+        }
+    return {
+        "success": False,
+        "message": resp['message']
+    }
+
 
 def _validate_and_generate_response(state, latest_user_msg):
+    meet_resp = _check_product_reminder(state, latest_user_msg)
+    if meet_resp['success'] and meet_resp['type'].lower() != 'reminder':
+        return {
+            "type": "general",
+            "message": meet_resp['message']
+        }
+    elif meet_resp['success'] and meet_resp['type'].lower() != 'reminder':
+        meeting_prompt_text = mode_prompts['meeting_prompt'].format(
+            user_query = latest_user_msg['content'],
+            tool_output = state['conversation_summary']
+        )
+        output = llm.invoke(meeting_prompt_text).content
+        return {
+            "type": 'meeting',
+            "message": output
+        }
+    
     mode_prompts = get_mode_specific_prompts(state.get('communication_mode', 'email'))
     
     validate_prompt_text = mode_prompts['validate_prompt'].format(
@@ -995,9 +1118,13 @@ def _validate_and_generate_response(state, latest_user_msg):
             "latest_message": latest_user_msg["content"],
             "product_details": product_card
         })
+
+        validate_product_pricing_output = llm.invoke(prompts.VALIDATE_PRODUCT_PRICING_PROMPT.format(output = assistant_reply)).content
+        
+
         return {
             "type": "general",
-            "message": assistant_reply
+            "message": validate_product_pricing_output
         }
     
 

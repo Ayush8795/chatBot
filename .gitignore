@@ -2,3 +2,4 @@
 env
 envv
 temp
+__pycache__

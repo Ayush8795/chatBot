@@ -149,3 +149,50 @@ VALIDATE_PROMPT = """
     }}
     Do not print anything else.
     """
+
+
+VALIDATE_PRODUCT_PRICING_PROMPT = """
+You are given with some text. Analyse and check if the text contains the pricing details of a product.
+In case there is the pricing details involved then remove them and only include basic information.
+Do not include any price or any free trial details.
+
+**Note:
+- Do not include any pricing or free trials or tenure details even if the user asks.
+- In case user asks for product pricing details generate an invitation message to invite user for a meeting.
+
+The output is:
+{output}
+"""
+
+
+PRODUCT_REMINDER_PROMPT = """
+You are given with the user query and conversation summary till now. 
+Decide whether user is asking for setting reminder or asking for product details and according frame the answer in a polite manner.
+You are communicating to:
+{user_profile}
+
+You are communicating them through:
+{communication_mode}
+
+So maintain the format.
+
+The Product details for your reference is:
+{product_details}
+
+Conversation Summary till now is:
+{conversation_summary}
+
+User's query is:
+{user_msg}
+
+**Note:
+- Do not include any pricing or free trials or tenure details even if the user asks.
+- In case user asks for product pricing details generate an invitation message to invite user for a meeting.
+
+Give your output in following JSON format:
+{{
+    "valid": <yes if the user is asking query related to product details or reminder>,
+    "type": <'reminder' if asking to set reminder and 'product' if asking product details>
+    "message:: <suitable reply message>
+}}
+"""
